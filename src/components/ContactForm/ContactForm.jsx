@@ -6,7 +6,7 @@ import { FaRegThumbsUp } from "react-icons/fa";
 import s from "./ContactForm.module.css";
 import { useDispatch } from "react-redux";
 
-import { addContactThunk } from "../../redux/operations";
+import { addContactThunk } from "../../redux/contactsOps";
 
 const initialValues = {
   name: "",
