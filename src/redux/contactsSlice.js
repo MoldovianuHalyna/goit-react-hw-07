@@ -1,26 +1,75 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, isAnyOf } from "@reduxjs/toolkit";
+import {
+  addContactThunk,
+  deleteContactThunk,
+  fetchContacts,
+} from "./operations";
 
 const initialState = {
-  items: [
-    { id: "id-1", name: "Rosie Simpson", number: "459-12-56" },
-    { id: "id-2", name: "Hermione Kline", number: "443-89-12" },
-    { id: "id-3", name: "Eden Clements", number: "645-17-79" },
-    { id: "id-4", name: "Annie Copeland", number: "227-91-26" },
-  ],
+  items: [],
+  isError: false,
+  isLoading: false,
 };
 
 const slice = createSlice({
   name: "contacts",
   initialState,
+
   reducers: {
-    addContact: (state, action) => {
-      state.items.push(action.payload);
+    fetchSuccess: (state, action) => {
+      state.items = action.payload;
+      state.isLoading = false;
     },
-    deleteContact: (state, action) => {
-      state.items = state.items.filter((item) => item.id !== action.payload);
+    setIsLoading: (state, action) => {
+      state.isLoading = action.payload;
     },
+    setIsError: (state, action) => {
+      state.isError = action.payload;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchContacts.fulfilled, (state, action) => {
+        state.items = action.payload;
+        state.isLoading = false;
+      })
+      .addCase(deleteContactThunk.fulfilled, (state, action) => {
+        state.items = state.items.filter((item) => item.id !== action.payload);
+        state.isLoading = false;
+      })
+      .addCase(addContactThunk.fulfilled, (state, action) => {
+        state.items.push(action.payload);
+        state.isLoading = false;
+      })
+      .addMatcher(
+        isAnyOf(
+          fetchContacts.pending,
+          deleteContactThunk.pending,
+          addContactThunk.pending
+        ),
+        (state) => {
+          state.isLoading = true;
+        }
+      )
+      .addMatcher(
+        isAnyOf(
+          fetchContacts.rejected,
+          deleteContactThunk.rejected,
+          addContactThunk.rejected
+        ),
+        (state, action) => {
+          state.isError = action.payload;
+          state.isLoading = false;
+        }
+      );
   },
 });
 
 export const contactReducer = slice.reducer;
-export const { addContact, deleteContact } = slice.actions;
+export const {
+  addContact,
+  deleteContact,
+  fetchSuccess,
+  setIsLoading,
+  setIsError,
+} = slice.actions;

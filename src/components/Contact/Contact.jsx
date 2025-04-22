@@ -4,12 +4,12 @@ import s from "./Contact.module.css";
 import { useDispatch } from "react-redux";
 import { Slide, toast } from "react-toastify";
 import { MdDeleteOutline } from "react-icons/md";
-import { deleteContact } from "../../redux/contactsSlice";
+import { deleteContactThunk } from "../../redux/operations";
 
 const Contact = ({ id, name, number }) => {
   const dispatch = useDispatch();
   const onDelete = (id) => {
-    dispatch(deleteContact(id));
+    dispatch(deleteContactThunk(id));
     toast.success("Contact deleted successfully", {
       position: "bottom-center",
       autoClose: 3000,
